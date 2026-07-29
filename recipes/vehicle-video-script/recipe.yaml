@@ -49,7 +49,7 @@ parameters:
   - key: style
     input_type: string
     requirement: optional
-    description: "JSON style knobs { pacing, camera_energy, tone, music_track, voice } from the style step (operator-overridable). Narration tone and camera moves must follow these."
+    description: "JSON style knobs { pacing, camera_energy, tone, voice } from the style step (operator-overridable). Narration tone and camera moves must follow these."
 
 settings:
   goose_provider: anthropic
