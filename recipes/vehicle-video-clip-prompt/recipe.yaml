@@ -1,9 +1,9 @@
 # Goose recipe: Vehicle Video — Veo clip prompt
 #
-# Step 2 of the vehicle-video pipeline, run ONCE PER APPROVED SECTION. Shapes one
-# storyboard section (its photo, scene title, camera direction) into a clean Veo
+# Step 2 of the vehicle-video pipeline, run ONCE PER APPROVED SHOT. Shapes one
+# storyboard shot (its photo, scene title, camera direction) into a clean Veo
 # text-to-video generation prompt + negative prompt. Cheap/mechanical, so a small
-# model does it. The module then calls Veo with the result and the section's
+# model does it. The module then calls Veo with the result and the shot's
 # photo; the operator approves or regenerates each resulting clip.
 #
 # The cinematography contract lives in the vehicle-video-clip-prompt skill
@@ -12,21 +12,29 @@
 # To run in Gatewaze:
 #   POST /api/modules/ai/admin/recipes/:id/run
 #     { "use_case": "vehicle-video-clip-prompt",
-#       "params": { "section": "{...}", "vehicle": "{...}" } }
+#       "params": { "shot": "{...}", "vehicle": "{...}" } }
 
 version: "1.0.0"
 title: "Vehicle Video — Veo clip prompt"
-description: "Turns one approved storyboard section into a single Google Veo generation prompt + negative prompt: smooth subtle camera motion, keep the real vehicle unchanged, no invented text/badges/people."
+description: "Turns one approved storyboard shot into a single Google Veo generation prompt + negative prompt: smooth subtle camera motion, keep the real vehicle unchanged, no invented text/badges/people."
 
 parameters:
-  - key: section
+  - key: shot
     input_type: string
     requirement: required
-    description: "JSON-encoded section: { section_kind, scene_title, camera_prompt }."
+    description: "JSON-encoded shot: { part, scene_title, camera_prompt }."
   - key: vehicle
     input_type: string
     requirement: required
     description: "JSON-encoded vehicle identification: { year, make, model, trim }."
+  - key: style
+    input_type: string
+    requirement: optional
+    description: "JSON style knobs { pacing, camera_energy, tone } from the style step. camera_energy sets how dynamic (but still controlled) the move is; pacing sets its speed."
+  - key: style_template
+    input_type: string
+    requirement: optional
+    description: "Body of the resolved style-template skill, piped by the module, so the camera vocabulary matches the video's overall treatment."
 
 settings:
   goose_provider: anthropic
@@ -37,15 +45,19 @@ instructions: |
   cinematography contract and the required negative-prompt baseline.
 
   Section:
-  {{ section }}
+  {{ shot }}
 
   Vehicle:
   {{ vehicle }}
 
+  Style knobs (set the move's energy + speed): {{ style }}
+  Style treatment (match the camera vocabulary):
+  {{ style_template }}
+
   Emit exactly one Veo prompt and one negative prompt via the response schema.
 
 prompt: |
-  Write the Veo clip prompt for this section.
+  Write the Veo clip prompt for this shot.
 
 response:
   json_schema:

@@ -1,7 +1,7 @@
 # Goose recipe: Vehicle Video — voiceover script
 #
 # Step 3 of the vehicle-video pipeline, run ONCE after the operator has approved
-# the final set of section clips. Stitches the approved sections' narration (in
+# the final set of section clips. Stitches the approved shots' narration (in
 # playback order) into one flowing, TTS-ready voiceover script, held within the
 # clips' combined duration so it never overruns the video. The module then calls
 # Gemini TTS with the result during final composition.
@@ -12,18 +12,18 @@
 # To run in Gatewaze:
 #   POST /api/modules/ai/admin/recipes/:id/run
 #     { "use_case": "vehicle-video-voiceover",
-#       "params": { "sections": "[...]", "total_duration_seconds": "32",
+#       "params": { "shots": "[...]", "total_duration_seconds": "32",
 #                   "vehicle": "{...}" } }
 
 version: "1.0.0"
 title: "Vehicle Video — voiceover script"
-description: "Combines the approved sections' narration (in final order) into one flowing, TTS-ready voiceover script for the composed video, kept within the total clip duration so the narration never overruns."
+description: "Combines the approved shots' narration (in final order) into one flowing, TTS-ready voiceover script for the composed video, kept within the total clip duration so the narration never overruns."
 
 parameters:
-  - key: sections
+  - key: shots
     input_type: string
     requirement: required
-    description: "JSON-encoded array of approved sections in playback order: [{ scene_title, narration }]."
+    description: "JSON-encoded array of approved shots in playback order: [{ scene_title, narration }]."
   - key: total_duration_seconds
     input_type: string
     requirement: required
@@ -32,6 +32,14 @@ parameters:
     input_type: string
     requirement: required
     description: "JSON-encoded vehicle identification: { year, make, model, trim }."
+  - key: style
+    input_type: string
+    requirement: optional
+    description: "JSON style knobs { tone, pacing } from the style step. The voiceover must be written in this tone; pacing informs sentence rhythm."
+  - key: style_template
+    input_type: string
+    requirement: optional
+    description: "Body of the resolved style-template skill, piped by the module, for tone consistency."
 
 settings:
   goose_provider: anthropic
@@ -46,8 +54,12 @@ instructions: |
   Vehicle:
   {{ vehicle }}
 
-  Approved sections in playback order:
-  {{ sections }}
+  Write in this style — tone/pacing knobs: {{ style }}
+  Style treatment:
+  {{ style_template }}
+
+  Approved shots in playback order:
+  {{ shots }}
 
   Emit the single voiceover script and its word count via the response schema.
 
