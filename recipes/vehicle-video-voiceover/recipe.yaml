@@ -1,0 +1,67 @@
+# Goose recipe: Vehicle Video — voiceover script
+#
+# Step 3 of the vehicle-video pipeline, run ONCE after the operator has approved
+# the final set of section clips. Stitches the approved sections' narration (in
+# playback order) into one flowing, TTS-ready voiceover script, held within the
+# clips' combined duration so it never overruns the video. The module then calls
+# Gemini TTS with the result during final composition.
+#
+# The tone + length contract lives in the vehicle-video-voiceover skill
+# (auto-loaded).
+#
+# To run in Gatewaze:
+#   POST /api/modules/ai/admin/recipes/:id/run
+#     { "use_case": "vehicle-video-voiceover",
+#       "params": { "sections": "[...]", "total_duration_seconds": "32",
+#                   "vehicle": "{...}" } }
+
+version: "1.0.0"
+title: "Vehicle Video — voiceover script"
+description: "Combines the approved sections' narration (in final order) into one flowing, TTS-ready voiceover script for the composed video, kept within the total clip duration so the narration never overruns."
+
+parameters:
+  - key: sections
+    input_type: string
+    requirement: required
+    description: "JSON-encoded array of approved sections in playback order: [{ scene_title, narration }]."
+  - key: total_duration_seconds
+    input_type: string
+    requirement: required
+    description: "Combined duration of the approved clips, in seconds. The voiceover must be speakable within this at a natural pace."
+  - key: vehicle
+    input_type: string
+    requirement: required
+    description: "JSON-encoded vehicle identification: { year, make, model, trim }."
+
+settings:
+  goose_provider: anthropic
+  goose_model: claude-sonnet-4-5
+
+instructions: |
+  Follow the vehicle-video-voiceover skill (auto-loaded) — it holds the tone,
+  TTS-readability, and hard length constraint.
+
+  Total video duration: {{ total_duration_seconds }} seconds.
+
+  Vehicle:
+  {{ vehicle }}
+
+  Approved sections in playback order:
+  {{ sections }}
+
+  Emit the single voiceover script and its word count via the response schema.
+
+prompt: |
+  Write the final voiceover script for this video.
+
+response:
+  json_schema:
+    type: object
+    required: [voiceover, word_count]
+    properties:
+      voiceover:
+        type: string
+        description: "The final narration as one plain-text block, TTS-ready."
+      word_count:
+        type: integer
+        description: "Word count of voiceover, for the module to sanity-check against duration."
