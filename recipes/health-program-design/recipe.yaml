@@ -1,0 +1,133 @@
+# Goose recipe: Health Fitness — build the agreed program
+#
+# Step 2 of the health-fitness coach flow. The member has agreed a plan with the
+# coach, and this turns it into a concrete week of training: the split, the
+# order of movements, sets, reps, rest and how the weight goes up.
+#
+# The catalogue passed in is the ONLY set of exercises this deployment holds,
+# already filtered to the member's equipment. Every emitted exerciseId is
+# validated against it by the module before anything is written, and a program
+# containing an unknown id is rejected and regenerated with the errors attached.
+#
+# The programming contract lives in the health-program-design skill
+# (auto-loaded). The module owns validation, storage and the daily cap.
+#
+# To run in Gatewaze:
+#   POST /api/modules/ai/admin/recipes/:id/run
+#     { "use_case": "health-program-design",
+#       "params": { "member_context": "...", "agreed_plan": "...",
+#                   "transcript": "...", "catalogue": "..." } }
+
+version: "1.0.0"
+title: "Health Fitness — build the agreed program"
+description: "Turns an agreed coaching plan into a week of training, built only from the deployment's exercise catalogue. Chooses the split from the days available, orders compounds before isolation, sizes sessions to the stated time, covers squat/hinge/push/pull/core across the week, and sets a progression rule per exercise."
+
+parameters:
+  - key: member_context
+    input_type: string
+    requirement: required
+    description: "Plain-text block: profile, current goal and target date, recent weight readings, and sessions logged in the last 28 days."
+  - key: agreed_plan
+    input_type: string
+    requirement: required
+    description: "The one-sentence plan the member agreed with the coach, taken from the PLAN AGREED line."
+  - key: transcript
+    input_type: string
+    requirement: required
+    description: "The relevant part of the conversation, so the builder sees the equipment, available days, session length and any injuries the member described."
+  - key: catalogue
+    input_type: string
+    requirement: required
+    description: "The only exercises available, one per line as 'id | name | equipment | muscles'. Already filtered to the member's equipment. Ids must be copied exactly."
+  - key: prior_errors
+    input_type: string
+    requirement: optional
+    description: "Validation errors from a previous rejected attempt, one per line. When present, every one must be fixed."
+
+settings:
+  goose_provider: anthropic
+  goose_model: claude-sonnet-5
+
+instructions: |
+  Follow the health-program-design skill (auto-loaded). It holds how to pick the
+  split, how to order a session, how to size sets, reps and rest to the goal,
+  and which progression rule belongs on which kind of exercise.
+
+  What you know about this member:
+  {{ member_context }}
+
+  The plan they agreed:
+  {{ agreed_plan }}
+
+  The relevant part of the conversation, which is where the equipment, days,
+  session length and injuries were stated:
+  {{ transcript }}
+
+  The ONLY exercises available (id | name | equipment | muscles). Copy ids
+  exactly. Anything not on this list does not exist in this deployment:
+  {{ catalogue }}
+
+  Your previous attempt was rejected for these reasons. Fix all of them:
+  {{ prior_errors }}
+
+  Emit the program via the response schema. Do not answer in prose.
+
+prompt: |
+  Build the program.
+
+response:
+  json_schema:
+    type: object
+    required: [name, goalType, weeks, days]
+    properties:
+      name:
+        type: string
+        maxLength: 80
+        description: "Short name for the program, e.g. 'Three day full body'."
+      goalType:
+        type: string
+        enum: [fat_loss, muscle_gain, strength, general_fitness]
+      weeks:
+        type: integer
+        minimum: 1
+        maximum: 52
+      days:
+        type: array
+        minItems: 1
+        maxItems: 7
+        items:
+          type: object
+          required: [label, slots]
+          properties:
+            label:
+              type: string
+              description: "e.g. 'Upper body' or 'Day 1'."
+            slots:
+              type: array
+              minItems: 1
+              maxItems: 10
+              description: "Exercises in the order they are performed. Compounds first."
+              items:
+                type: object
+                required: [exerciseId, sets, restSeconds]
+                properties:
+                  exerciseId:
+                    type: string
+                    description: "MUST be an id copied exactly from the supplied catalogue."
+                  sets:      { type: integer, minimum: 1, maximum: 10 }
+                  repsMin:   { type: integer, minimum: 1, maximum: 100 }
+                  repsMax:   { type: integer, minimum: 1, maximum: 100 }
+                  durationSeconds:
+                    type: integer
+                    minimum: 5
+                    maximum: 3600
+                    description: "Use INSTEAD of repsMin/repsMax for held or timed work. Never both."
+                  restSeconds: { type: integer, minimum: 0, maximum: 600 }
+                  progressionKind:
+                    type: string
+                    enum: [none, linear_weight, double_progression]
+                  progressionIncrementKg: { type: number, minimum: 0, maximum: 50 }
+                  note:
+                    type: string
+                    maxLength: 200
+                    description: "Optional cue. Only where it prevents a common error or explains the starting weight."
