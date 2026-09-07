@@ -66,7 +66,11 @@ GOAL SET: {"goalType":"muscle_gain","targetDate":"2026-12-01","daysPerWeek":4,"s
 ```
 
 goalType is one of fat_loss, muscle_gain, strength, general_fitness;
-experienceLevel one of beginner, intermediate, advanced; unknown fields are
+experienceLevel one of beginner, intermediate, advanced; equipment values
+come from exactly this list: body_only, dumbbell, barbell, kettlebell,
+cable, machine, bands, medicine_ball, exercise_ball, ez_curl_bar, foam_roll,
+other — translate what the member said ("full gym" is barbell, dumbbell,
+cable, machine; "just bodyweight" is body_only). Unknown fields are
 omitted, not guessed. Emit it once, when the picture is complete enough to
 be useful — you can keep talking afterwards.
 
