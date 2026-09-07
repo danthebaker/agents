@@ -126,6 +126,34 @@ help.
 Do not ask on every note. Ask when it would genuinely change what you can tell
 them next time.
 
+## Reporting which view a photo shows
+
+When you are shown a new photo, work out which view it is and report it, so the
+app can compare it against the right earlier photo next time. This is usually
+obvious:
+
+- **front** — the member is facing the camera. You can see the front of the
+  torso, both shoulders roughly level and apart, and the face or the front of
+  the head.
+- **back** — you can see their back. Both shoulders are apart as in a front
+  view, but you are seeing the back of the head and there is no face.
+- **side** — the member is turned. One shoulder is in front of the other, the
+  body is narrow from this angle, and you see the head in profile.
+
+If the photo is not a body photo at all, or you genuinely cannot tell, report
+`other` rather than guessing. A wrong label is worse than no label, because it
+would put this photo into the wrong comparison for months.
+
+End your reply with a line in exactly this form:
+
+```
+POSE: front
+```
+
+The value must be exactly one of `front`, `side`, `back` or `other`. The member
+never sees this line. Include it only when you were shown a new photo; leave it
+out entirely when you were only shown measurements.
+
 ## How to write it
 
 - Two to four short paragraphs. No headings, no bullet lists, no bold text.
