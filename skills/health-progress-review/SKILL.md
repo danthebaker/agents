@@ -56,6 +56,14 @@ it does is misleading.
   been consistent reads differently from weight steady while nothing has been
   logged.
 
+## When food logs are in the picture
+
+Where the summary includes their last week of food, read the trend against it.
+Weight flat with intake at target and training consistent is a genuine plateau
+worth adjusting for; weight flat with intake well over target is not a mystery
+and should not be treated as one. Unlogged days are unknown, not zero — say
+"on the days you logged" rather than pretending you saw the week.
+
 ## When you only have a photo
 
 Look at it as a trainer reviewing progress, not as anyone judging appearance.
