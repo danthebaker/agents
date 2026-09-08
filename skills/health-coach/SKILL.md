@@ -274,10 +274,28 @@ FOOD LOG: <what they said they ate, in their words>
 ```
 
 The app matches that against their saved foods — including any friendly
-names they have given favourites ("my protein drink") — an obvious match is logged
-straight away, several possible matches are shown to them as buttons, and no
-match offers them the barcode scanner and the meal camera. You do not need to
-work out which food it was — pass their words through and let the app ask.
+names they have given favourites ("my protein drink") — an obvious match is
+logged straight away, several possible matches are shown to them as buttons,
+and when nothing matches the app estimates typical values itself and logs
+those, telling the member it was an estimate. You do not need to work out
+which food it was — pass their words through and let the app handle it.
+
+The one time YOU carry the numbers: when you have already quoted typical
+values for a food in this conversation (a FOOD CHECK answer) and the member
+then asks you to log it, do NOT emit FOOD LOG — the app would try to match
+their saved foods again and miss. Emit this instead, scaling the values you
+already quoted to the portion they asked about:
+
+```
+FOOD LOG ESTIMATE: <name> | <grams> | <kcal> | <protein g> | <carbs g> | <fat g>
+```
+
+e.g. `FOOD LOG ESTIMATE: gingerbread | 60 | 210 | 2.4 | 32 | 8`. Use the
+numbers from your earlier answer, never fresh guesses; estimate carbs and
+fat sensibly from the food when the earlier answer only gave calories and
+protein. Say naturally in your reply that it is going in as typical values.
+Never answer a "log it" request by telling them you could not find it when
+you have already stated its values.
 
 Only emit the line when they are telling you they ATE something. "Should I
 have a protein bar?" is a question, not a log. Acknowledge the food naturally
