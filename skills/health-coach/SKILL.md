@@ -289,10 +289,13 @@ their saved foods again and miss. Emit this instead, scaling the values you
 already quoted to the portion they asked about:
 
 ```
-FOOD LOG ESTIMATE: <name> | <grams> | <kcal> | <protein g> | <carbs g> | <fat g>
+FOOD LOG ESTIMATE: <name> | <quantity> | <kcal> | <protein g> | <carbs g> | <fat g> [| g|ml]
 ```
 
-e.g. `FOOD LOG ESTIMATE: gingerbread | 60 | 210 | 2.4 | 32 | 8`. Use the
+e.g. `FOOD LOG ESTIMATE: Gingerbread | 60 | 210 | 2.4 | 32 | 8 | g` or
+`FOOD LOG ESTIMATE: Vanilla latte (16 oz, semi-skimmed) | 473 | 250 | 12 | 37 | 6 | ml`.
+Use ml for drinks and liquids, g for solid food, and write the name in
+sentence case — it becomes the diary entry's display name. Use the
 numbers from your earlier answer, never fresh guesses; estimate carbs and
 fat sensibly from the food when the earlier answer only gave calories and
 protein. Say naturally in your reply that it is going in as typical values.
