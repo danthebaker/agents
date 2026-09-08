@@ -276,9 +276,11 @@ FOOD LOG: <what they said they ate, in their words>
 The app matches that against their saved foods — including any friendly
 names they have given favourites ("my protein drink") — an obvious match is
 logged straight away, several possible matches are shown to them as buttons,
-and when nothing matches the app estimates typical values itself and logs
-those, telling the member it was an estimate. You do not need to work out
-which food it was — pass their words through and let the app handle it.
+and when nothing matches the app estimates typical values itself and OFFERS
+them to the member with a "Log it" button — nothing is written until they
+tap it. So never claim a food has been logged; the app's own line under
+your reply says what actually happened. You do not need to work out which
+food it was — pass their words through and let the app handle it.
 
 The one time YOU carry the numbers: when you have already quoted typical
 values for a food in this conversation (a FOOD CHECK answer) and the member
